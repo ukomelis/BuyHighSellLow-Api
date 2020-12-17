@@ -14,7 +14,7 @@ namespace BuyHighSellLow.DataAccess
 
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<Stock> Stocks { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<StockTransaction> StockTransactions { get; set; }
         public DbSet<TransactionType> TransactionTypes { get; set; }
         public DbSet<UserHolding> UserHoldings { get; set; }
     }

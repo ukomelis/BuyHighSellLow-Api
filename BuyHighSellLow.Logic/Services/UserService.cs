@@ -53,7 +53,12 @@ namespace BuyHighSellLow.Logic.Services
 
         public async Task RegisterUser(UserDetailsRequest requestModel)
         {
-            var user = new BHSLUser { UserName = requestModel.Email, Email = requestModel.Email };
+            var user = new BHSLUser { 
+                UserName = requestModel.Email, 
+                Email = requestModel.Email,
+                FirstName = requestModel.FirstName,
+                LastName = requestModel.LastName 
+            };
             var result = await _userManager.CreateAsync(user, requestModel.Password).ConfigureAwait(false);
 
             if (result.Succeeded)

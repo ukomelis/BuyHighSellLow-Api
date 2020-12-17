@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BuyHighSellLow.DataAccess.Models
 {
-    public class Transaction
+    public class StockTransaction
     {
         public int Id { get; set; }
         [Required]

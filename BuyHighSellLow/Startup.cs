@@ -1,5 +1,6 @@
 using BuyHighSellLow.DataAccess;
 using BuyHighSellLow.DataAccess.Models.Identity;
+using BuyHighSellLow.Logic.HttpClients;
 using BuyHighSellLow.Logic.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -88,6 +89,10 @@ namespace BuyHighSellLow
             services.AddScoped<Logic.Models.Configuration.IConfigurationProvider, Logic.Models.Configuration.ConfigurationProvider>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IStocksTransactionsService, StocksTransactionsService>();
+            services.AddScoped<IStocksService, StocksService>();
+            services.AddScoped<IFMPClient, FMPClient>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
