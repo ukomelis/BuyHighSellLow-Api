@@ -20,6 +20,30 @@ namespace BuyHighSellLow.Controllers
         }
 
         /// <summary>
+        /// Returns user details
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        // GET: api/user/
+        [HttpGet]
+        [Route("")]
+        public async Task<IActionResult> GetUser(string username)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            try
+            {
+                var user = await _userService.GetUser(username);
+
+                return Ok(user);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(500);
+            }
+        }
+
+        /// <summary>
         /// Signs in an user
         /// </summary>
         /// <param name="requestModel"></param>

@@ -64,7 +64,8 @@ namespace BuyHighSellLow.Logic.Services
                 UserName = requestModel.Username, 
                 Email = requestModel.Email,
                 FirstName = requestModel.FirstName,
-                LastName = requestModel.LastName 
+                LastName = requestModel.LastName,
+                Balance = 0
             };
             var result = await _userManager.CreateAsync(user, requestModel.Password).ConfigureAwait(false);
 
@@ -85,7 +86,7 @@ namespace BuyHighSellLow.Logic.Services
 
         public async Task<BHSLUser> GetUser(string username)
         {
-            var user = await _userManager.FindByEmailAsync(username).ConfigureAwait(false);
+            var user = await _userManager.FindByNameAsync(username).ConfigureAwait(false);
             if (user == null) throw new Exception($"Failed to find the user: {username}");
 
             return user;

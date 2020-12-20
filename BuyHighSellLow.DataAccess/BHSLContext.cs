@@ -10,7 +10,7 @@ namespace BuyHighSellLow.DataAccess
         public BHSLContext(DbContextOptions<BHSLContext> options) : base(options)
         {
 
-        }
+        }                
 
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<Stock> Stocks { get; set; }
