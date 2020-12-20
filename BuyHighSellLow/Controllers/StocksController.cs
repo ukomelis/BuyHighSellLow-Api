@@ -16,37 +16,57 @@ namespace BuyHighSellLow.Controllers
     [AllowAnonymous]
     public class StocksController : ControllerBase
     {
-        private readonly IStocksTransactionsService _stocksTransactionsService;
+        private readonly IStocksTransactionService _stocksTransactionsService;
 
-        public StocksController(IStocksTransactionsService stockTransactionsService)
+        public StocksController(IStocksTransactionService stockTransactionsService)
         {
             _stocksTransactionsService = stockTransactionsService ?? throw new ArgumentNullException(nameof(stockTransactionsService));
         }
 
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok("ok");
+        }
+
         /// <summary>
-        /// Buys or sells stock(s)
+        /// Buys stocks
         /// </summary>
         /// <param name="requestModel"></param>
         /// <returns></returns>
-        // POST: api/stocks/transaction
+        // POST: api/stocks/buy
         [HttpPost]
-        [Route("transaction")]
-        public async Task<IActionResult> Transaction([FromBody] StocksTransactionRequest requestModel)
+        [Route("buy")]
+        public async Task<IActionResult> Buy([FromBody] StocksTransactionRequest requestModel)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            try
+            {                
+                await _stocksTransactionsService.BuyStocks(requestModel);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(500);
+            }
+        }
+
+        /// <summary>
+        /// Sell stocks
+        /// </summary>
+        /// <param name="requestModel"></param>
+        /// <returns></returns>
+        // POST: api/stocks/sell
+        [HttpPost]
+        [Route("sell")]
+        public async Task<IActionResult> Sell([FromBody] StocksTransactionRequest requestModel)
         {
             if (!ModelState.IsValid) return BadRequest();
             try
             {
-                if(requestModel.TransactionType == (int)TransactionTypes.Buy)
-                {
-                    await _stocksTransactionsService.BuyStocks(requestModel);                    
-                }
-                else if(requestModel.TransactionType == (int)TransactionTypes.Sell)
-                {
-                    await _stocksTransactionsService.SellStocks(requestModel);
-                }
-
+                await _stocksTransactionsService.SellStocks(requestModel);
                 return Ok();
-
             }
             catch (Exception e)
             {

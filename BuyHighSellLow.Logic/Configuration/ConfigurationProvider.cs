@@ -20,6 +20,6 @@ namespace BuyHighSellLow.Logic.Models.Configuration
         public string GetFinnhubApiToken() => _configuration["APIInfos:FinnhubToken"];
         public string GetFinnhubApiUrl() => _configuration["APIInfos:FinnhubApiUrl"];
         public object GetFMPApiUrl() => _configuration["APIInfos:FMPApiUrl"];
-        public object GetFMPApiToken() => _configuration["APIInfos:FMPApiToken"];
+        public object GetFMPApiToken() => _configuration["APIInfos:FMPToken"];
     }
 }

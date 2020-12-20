@@ -8,5 +8,6 @@ namespace BuyHighSellLow.DataAccess.Models.Identity
         public string FirstName { get; set; }
         [PersonalData]
         public string LastName { get; set; }
+        public decimal Balance { get; set; }
     }
 }

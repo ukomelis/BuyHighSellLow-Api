@@ -40,7 +40,7 @@ namespace BuyHighSellLow
             services.AddHttpClient();
 
             services.AddDbContext<BHSLContext>(options =>
-    options.UseSqlServer(Configuration.GetConnectionString("BHSLDB")));
+    options.UseSqlServer(Configuration.GetConnectionString("BHSL_DB")));
             services.AddIdentity<BHSLUser, IdentityRole>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<BHSLContext>();
@@ -89,7 +89,7 @@ namespace BuyHighSellLow
             services.AddScoped<Logic.Models.Configuration.IConfigurationProvider, Logic.Models.Configuration.ConfigurationProvider>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
-            services.AddScoped<IStocksTransactionsService, StocksTransactionsService>();
+            services.AddScoped<IStocksTransactionService, StocksTransactionService>();
             services.AddScoped<IStocksService, StocksService>();
             services.AddScoped<IFMPClient, FMPClient>();
 

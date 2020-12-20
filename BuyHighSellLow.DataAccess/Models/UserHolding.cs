@@ -16,10 +16,6 @@ namespace BuyHighSellLow.DataAccess.Models
         [Required]
         public decimal AveragePrice { get; set; }
         [Required]
-        public decimal TotalAveragePrice { get; set; }
-        [Required]
-        public Currency Currency { get; set; }
-        [Required]
         public DateTime LastChanged { get; set; }
     }
 }

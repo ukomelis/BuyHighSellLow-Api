@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace BuyHighSellLow.Logic.Services
 {
-    public interface IStocksTransactionsService
+    public interface IStocksTransactionService
     {
         Task BuyStocks(StocksTransactionRequest request);
         Task SellStocks(StocksTransactionRequest request);
