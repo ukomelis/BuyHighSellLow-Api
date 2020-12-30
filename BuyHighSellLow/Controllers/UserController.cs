@@ -79,7 +79,7 @@ namespace BuyHighSellLow.Controllers
             try
             {
                 await _userService.SignOut();
-                
+
                 return Ok();
             }
             catch (Exception e)

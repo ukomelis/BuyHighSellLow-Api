@@ -41,8 +41,8 @@ namespace BuyHighSellLow.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             try
-            {                
-                await _stocksTransactionsService.BuyStocks(requestModel);
+            {
+                await _stocksTransactionsService.BuyStocks(requestModel).ConfigureAwait(false);
                 return Ok();
             }
             catch (Exception e)
@@ -65,7 +65,7 @@ namespace BuyHighSellLow.Controllers
             if (!ModelState.IsValid) return BadRequest();
             try
             {
-                await _stocksTransactionsService.SellStocks(requestModel);
+                await _stocksTransactionsService.SellStocks(requestModel).ConfigureAwait(false);
                 return Ok();
             }
             catch (Exception e)

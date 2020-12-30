@@ -20,7 +20,7 @@ namespace BuyHighSellLow.Logic.HttpClients
             _configurationProvider = configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
         }
 
-        public async Task<List<StockData>> GetStocksPrice(string[] tickers)
+        public async Task<List<StockData>> GetStockData(string[] tickers)
         {
             var stocksData = new List<StockData>();
 
@@ -32,19 +32,19 @@ namespace BuyHighSellLow.Logic.HttpClients
 
                 var client = _clientFactory.CreateClient();
 
-                var response = await client.SendAsync(request);
+                var response = await client.SendAsync(request).ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    using var responseStream = await response.Content.ReadAsStreamAsync();
-                    var result = await JsonSerializer.DeserializeAsync<JsonDocument>(responseStream);
+                    using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                    var result = await JsonSerializer.DeserializeAsync<JsonDocument>(responseStream).ConfigureAwait(false);
                     var b = result.RootElement;
                     foreach (var item in b.EnumerateArray())
                     {
                         item.TryGetProperty("symbol", out var ticker);
                         item.TryGetProperty("price", out var price);
                         stocksData.Add(new StockData { Ticker = ticker.ToString(), Price = Convert.ToDecimal(price.ToString()) });
-                    }                    
+                    }
                 }
                 else
                 {
