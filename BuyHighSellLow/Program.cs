@@ -21,6 +21,8 @@ namespace BuyHighSellLow
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .ConfigureWebHost(c => c.UseUrls("http://*:5000"))
+                .UseWindowsService();
     }
 }
