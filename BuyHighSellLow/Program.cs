@@ -22,7 +22,7 @@ namespace BuyHighSellLow
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .ConfigureWebHost(c => c.UseUrls("http://*:5000"))
+                .ConfigureWebHost(c => c.UseUrls("http://localhost:5000"))
                 .UseWindowsService();
     }
 }
