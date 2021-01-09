@@ -108,7 +108,12 @@ namespace BuyHighSellLow
             //app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials());
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

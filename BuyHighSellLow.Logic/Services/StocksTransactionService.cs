@@ -22,10 +22,7 @@ namespace BuyHighSellLow.Logic.Services
         {
             try
             {
-                var tickers = new List<string>();
-                request.Orders.ForEach(x => tickers.Add(x.Ticker));
-
-                var totalPrice = await CalculateTotalOrderPrice(tickers).ConfigureAwait(false);
+                var totalPrice = await CalculateTotalOrderPrice(request.Orders).ConfigureAwait(false);
                 var userBalance = await _userService.GetUserBalance(request.Username).ConfigureAwait(false);
 
                 if (userBalance < totalPrice) throw new Exception("Not enough balance");
@@ -46,7 +43,7 @@ namespace BuyHighSellLow.Logic.Services
                 var tickers = new List<string>();
                 request.Orders.ForEach(x => tickers.Add(x.Ticker));
 
-                var totalPrice = await CalculateTotalOrderPrice(tickers).ConfigureAwait(false);
+                var totalPrice = await CalculateTotalOrderPrice(request.Orders).ConfigureAwait(false);
 
                 //Add stocks to acc and take payment
                 await _userService.RemoveStocksFromAccount(request.Orders, request.Username, totalPrice).ConfigureAwait(false);
@@ -57,14 +54,28 @@ namespace BuyHighSellLow.Logic.Services
             }
         }
 
-        private async Task<decimal> CalculateTotalOrderPrice(List<string> tickers)
+        public async Task<decimal> CalculateTotalOrderPrice(List<StockOrder> stockOrders)
         {
-            var stocksData = await _FMPClient.GetStocksPrice(tickers.ToArray()).ConfigureAwait(false);
+            try
+            {
+                var tickers = new List<string>();
+                stockOrders.ForEach(x => tickers.Add(x.Ticker));
 
-            decimal totalPrice = 0;
-            stocksData.ForEach(x => totalPrice += x.Price);
+                var stocksData = await _FMPClient.GetStockData(tickers.ToArray()).ConfigureAwait(false);
 
-            return totalPrice;
+                decimal totalPrice = 0;
+                stocksData.ForEach(x => {
+                    var order = stockOrders.Find(o => o.Ticker.Equals(x.Ticker, StringComparison.OrdinalIgnoreCase));
+                    totalPrice += x.Price * order.Amount;
+                });
+
+                return totalPrice;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to calculate total price: {ex}");
+                throw;
+            }
         }
     }
 }

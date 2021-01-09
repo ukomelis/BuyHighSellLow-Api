@@ -6,6 +6,6 @@ namespace BuyHighSellLow.Logic.HttpClients
 {
     public interface IFMPClient
     {
-        Task<List<StockData>> GetStocksPrice(string[] tickers);
+        Task<List<StockData>> GetStockData(string[] tickers);
     }
 }

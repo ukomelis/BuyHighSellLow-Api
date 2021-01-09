@@ -8,7 +8,7 @@ namespace BuyHighSellLow.Logic.Services
 {
     public interface IStocksService
     {
-        Task AddStocks(List<StockOrder> orders, string username);
+        Task AddStocksToAccount(List<StockOrder> orders, string username);
         Task RemoveStocks(List<StockOrder> orders, string username);
     }
 }

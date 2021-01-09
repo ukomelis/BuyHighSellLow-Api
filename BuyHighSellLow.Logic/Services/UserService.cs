@@ -60,8 +60,8 @@ namespace BuyHighSellLow.Logic.Services
 
         public async Task RegisterUser(UserDetailsRequest requestModel)
         {
-            var user = new BHSLUser { 
-                UserName = requestModel.Username, 
+            var user = new BHSLUser {
+                UserName = requestModel.Username,
                 Email = requestModel.Email,
                 FirstName = requestModel.FirstName,
                 LastName = requestModel.LastName,
@@ -130,9 +130,9 @@ namespace BuyHighSellLow.Logic.Services
         {
             try
             {
-                await _stocksService.AddStocks(orders, username).ConfigureAwait(false);
+                await _stocksService.AddStocksToAccount(orders, username).ConfigureAwait(false);
                 var user = await _context.Users.FindAsync(username).ConfigureAwait(false);
-                user.Balance = +totalPrice;
+                user.Balance += totalPrice;
                 await _context.SaveChangesAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -148,7 +148,7 @@ namespace BuyHighSellLow.Logic.Services
             {
                 await _stocksService.RemoveStocks(orders, username).ConfigureAwait(false);
                 var user = await _context.Users.FindAsync(username).ConfigureAwait(false);
-                user.Balance = -totalPrice;
+                user.Balance -= totalPrice;
                 await _context.SaveChangesAsync().ConfigureAwait(false);
             }
             catch (Exception ex)

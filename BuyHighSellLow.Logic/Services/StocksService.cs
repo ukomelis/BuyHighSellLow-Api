@@ -19,11 +19,11 @@ namespace BuyHighSellLow.Logic.Services
         }
 
 
-        public async Task AddStocks(List<StockOrder> orders, string username)
+        public async Task AddStocksToAccount(List<StockOrder> orders, string username)
         {
             try
             {
-                var user = _context.Users.FirstOrDefault(x => x.UserName.ToLower() == username.ToLower());
+                var user = _context.Users.FirstOrDefault(x => string.Equals(x.UserName, username, StringComparison.OrdinalIgnoreCase));
                 var userHoldings = _context.UserHoldings.Where(x => x.User == user).ToList();
                 if (userHoldings.Count < 1)
                 {
@@ -50,19 +50,20 @@ namespace BuyHighSellLow.Logic.Services
         {
             try
             {
-                var user = _context.Users.FirstOrDefault(x => x.UserName.ToLower() == username.ToLower());
+                var user = _context.Users.FirstOrDefault(x => string.Equals(x.UserName, username, StringComparison.OrdinalIgnoreCase));
                 var userHoldings = _context.UserHoldings.Where(x => x.User == user).ToList();
                 if (userHoldings.Count < 1) throw new Exception("User has no stocks to remove");
+
                 foreach (var order in orders)
                 {
-                    var holding = userHoldings.FirstOrDefault(x => x.Stock.Ticker.ToLower() == order.Ticker.ToLower());
+                    var holding = userHoldings.Find(x => string.Equals(x.Stock.Ticker, order.Ticker, StringComparison.OrdinalIgnoreCase));
 
                     if (holding == null) throw new Exception($"User does not hold stock: {order.Ticker}. Failed to sell");
                     if(order.Amount > holding.Amount) throw new Exception($"Sell order is for more stocks than user owns. Failed to sell: {order.Ticker}.");
 
                     if (holding.Amount - order.Amount == 0) userHoldings.Remove(holding);
-                    else holding.Amount = -order.Amount;
-                }                   
+                    else holding.Amount -= order.Amount;
+                }
 
                 await _context.SaveChangesAsync().ConfigureAwait(false);
             }
@@ -77,7 +78,7 @@ namespace BuyHighSellLow.Logic.Services
         {
             try
             {
-                var stock = _context.Stocks.FirstOrDefault(x => x.Ticker.ToLower() == ticker.ToLower());
+                var stock = _context.Stocks.FirstOrDefault(x => string.Equals(x.Ticker, ticker, StringComparison.OrdinalIgnoreCase));
                 if (stock != null) return stock;
 
                 var newStock = await AddStockToDb(ticker).ConfigureAwait(false);
@@ -95,14 +96,25 @@ namespace BuyHighSellLow.Logic.Services
 
         private async Task<Stock> AddStockToDb(string ticker)
         {
-            var stock = await GetStockFromApi(ticker).ConfigureAwait(false);
+            try
+            {
+                var stock = _context.Stocks.Find(ticker);
 
-            await _context.Stocks.AddAsync(stock).ConfigureAwait(false);
+                if (stock != null) return stock;
 
-            return stock;
+                stock = await GetStocksFromApi(new string[] { ticker }).ConfigureAwait(false);
+                await _context.Stocks.AddAsync(stock).ConfigureAwait(false);
+
+                return stock;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
 
-        private async Task<Stock> GetStockFromApi(string ticker)
+        private async Task<Stock> GetStocksFromApi(string[] ticker)
         {
             throw new NotImplementedException();
         }
