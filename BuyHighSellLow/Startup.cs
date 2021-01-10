@@ -1,7 +1,10 @@
 using BuyHighSellLow.DataAccess;
 using BuyHighSellLow.DataAccess.Models.Identity;
 using BuyHighSellLow.Logic.HttpClients;
+using BuyHighSellLow.Logic.Jobs;
 using BuyHighSellLow.Logic.Services;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -86,17 +89,34 @@ namespace BuyHighSellLow
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BuyHighSellLow API", Version = "v1" });
             });
 
+            //Hangfire
+            services.AddHangfire(conf => conf.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(Configuration.GetConnectionString("HangfireConnection"), new Hangfire.SqlServer.SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    DisableGlobalLocks = true
+                }));
+
+            services.AddHangfireServer();
+
             services.AddScoped<Logic.Models.Configuration.IConfigurationProvider, Logic.Models.Configuration.ConfigurationProvider>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IStocksTransactionService, StocksTransactionService>();
             services.AddScoped<IStocksService, StocksService>();
             services.AddScoped<IFMPClient, FMPClient>();
+            services.AddScoped<IFinnhubClient, FinnhubClient>();
+            services.AddScoped<IStocksDataJobs, StocksDataJobs>();
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IBackgroundJobClient backgroundJobs, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -120,6 +140,11 @@ namespace BuyHighSellLow
             {
                 endpoints.MapControllers();
             });
+
+            app.UseHangfireDashboard();
+            backgroundJobs.Enqueue(() => Console.WriteLine("Hello World"));
+            //backgroundJobs.Schedule(() => serviceProvider.GetService<IStocksDataJobs>().AddAllStocksToDatabase(), TimeSpan.FromDays(1));
+            backgroundJobs.Enqueue(() => serviceProvider.GetService<IStocksDataJobs>().CheckAndAddNewTickersToDb("US"));
         }
     }
 }

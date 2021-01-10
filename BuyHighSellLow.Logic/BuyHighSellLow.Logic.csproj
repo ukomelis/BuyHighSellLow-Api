@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Responses\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\BuyHighSellLow.DataAccess\BuyHighSellLow.DataAccess.csproj" />
   </ItemGroup>
 

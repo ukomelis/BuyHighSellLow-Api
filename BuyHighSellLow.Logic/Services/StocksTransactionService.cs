@@ -61,7 +61,7 @@ namespace BuyHighSellLow.Logic.Services
                 var tickers = new List<string>();
                 stockOrders.ForEach(x => tickers.Add(x.Ticker));
 
-                var stocksData = await _FMPClient.GetStocksData(tickers.ToArray()).ConfigureAwait(false);
+                var stocksData = await _FMPClient.GetStocksPrices(tickers.ToArray()).ConfigureAwait(false);
 
                 decimal totalPrice = 0;
                 stocksData.ForEach(x => {

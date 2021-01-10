@@ -30,7 +30,7 @@ namespace BuyHighSellLow.Logic.Services
                     var newUserHoldings = new List<UserHolding>();
                     foreach (var order in orders)
                     {
-                        var stock = await GetStockFromDb(order.Ticker).ConfigureAwait(false);
+                        var stock = GetStockFromDb(order.Ticker);
                         newUserHoldings.Add(new UserHolding { Amount = order.Amount, Stock = stock, AveragePrice = stock.Price, LastChanged = DateTime.Now, User = user });
                     }
 
@@ -40,10 +40,8 @@ namespace BuyHighSellLow.Logic.Services
             }
             catch (Exception ex)
             {
-
-                throw;
+                throw new Exception($"Failed to add stocks to account! User: {username}", ex);
             }
-
         }
 
         public async Task RemoveStocks(List<StockOrder> orders, string username)
@@ -69,54 +67,35 @@ namespace BuyHighSellLow.Logic.Services
             }
             catch (Exception ex)
             {
-
-                throw;
+                throw new Exception($"Failed to remove stocks from user: {username}", ex);
             }
         }
 
-        private async Task<Stock> GetStockFromDb(string ticker)
+        private Stock GetStockFromDb(string ticker)
         {
             try
             {
                 var stock = _context.Stocks.FirstOrDefault(x => string.Equals(x.Ticker, ticker, StringComparison.OrdinalIgnoreCase));
                 if (stock != null) return stock;
 
-                var newStock = await AddStockToDb(ticker).ConfigureAwait(false);
-                await _context.Stocks.AddAsync(newStock).ConfigureAwait(false);
-                await _context.SaveChangesAsync().ConfigureAwait(false);
-
-                return newStock;
+                throw new Exception($"Failed to find stock from DB: {ticker}");
             }
             catch (Exception ex)
             {
-
-                throw;
+                throw new Exception($"Failed to get stock from DB: {ticker}", ex);
             }
         }
 
-        private async Task<Stock> AddStockToDb(string ticker)
+        public async Task AddStocksToDatabase(IEnumerable<Stock> stocks)
         {
-            try
-            {
-                var stock = _context.Stocks.Find(ticker);
+            _context.Stocks.AddRange(stocks);
 
-                if (stock != null) return stock;
-
-                stock = await GetStocksFromApi(new string[] { ticker }).ConfigureAwait(false);
-                await _context.Stocks.AddAsync(stock).ConfigureAwait(false);
-
-                return stock;
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
+            await _context.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        private async Task<Stock> GetStocksFromApi(string[] ticker)
+        public string[] GetAllAvailableTickersFromDb()
         {
-            throw new NotImplementedException();
+            return _context.Stocks.Select(x => x.Ticker).ToArray();
         }
     }
 }

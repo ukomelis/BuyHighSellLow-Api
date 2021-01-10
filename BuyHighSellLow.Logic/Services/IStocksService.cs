@@ -1,4 +1,6 @@
-﻿using BuyHighSellLow.Logic.Models.Requests;
+﻿using BuyHighSellLow.DataAccess.Models;
+using BuyHighSellLow.Logic.Models;
+using BuyHighSellLow.Logic.Models.Requests;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,5 +12,7 @@ namespace BuyHighSellLow.Logic.Services
     {
         Task AddStocksToAccount(List<StockOrder> orders, string username);
         Task RemoveStocks(List<StockOrder> orders, string username);
+        Task AddStocksToDatabase(IEnumerable<Stock> stocks);
+        string[] GetAllAvailableTickersFromDb();
     }
 }

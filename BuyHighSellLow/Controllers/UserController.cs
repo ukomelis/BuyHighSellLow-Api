@@ -77,7 +77,7 @@ namespace BuyHighSellLow.Controllers
             if (!ModelState.IsValid) return BadRequest();
             try
             {
-                await _userService.SignOut();
+                await _userService.SignOut().ConfigureAwait(false);
 
                 return Ok();
             }
@@ -102,7 +102,7 @@ namespace BuyHighSellLow.Controllers
             if (!ModelState.IsValid) return BadRequest();
             try
             {
-                await _userService.RegisterUser(requestModel);
+                await _userService.RegisterUser(requestModel).ConfigureAwait(false);
 
                 return Ok();
             }
@@ -126,7 +126,7 @@ namespace BuyHighSellLow.Controllers
             if (!ModelState.IsValid) return BadRequest();
             try
             {
-                await _userService.EditUser(requestModel);
+                await _userService.EditUser(requestModel).ConfigureAwait(false);
 
                 return Ok();
             }

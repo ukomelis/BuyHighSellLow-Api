@@ -1,5 +1,7 @@
-﻿using BuyHighSellLow.Logic.Models;
+﻿using BuyHighSellLow.DataAccess.Models;
+using BuyHighSellLow.Logic.Models;
 using BuyHighSellLow.Logic.Models.Configuration;
+using BuyHighSellLow.Logic.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -20,9 +22,9 @@ namespace BuyHighSellLow.Logic.HttpClients
             _configurationProvider = configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
         }
 
-        public async Task<List<StockData>> GetStocksData(string[] tickers)
+        public async Task<List<Stock>> GetStocksPrices(string[] tickers)
         {
-            var stocksData = new List<StockData>();
+            var stocksList = new List<Stock>();
 
             try
             {
@@ -37,13 +39,15 @@ namespace BuyHighSellLow.Logic.HttpClients
                 if (response.IsSuccessStatusCode)
                 {
                     using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                    var result = await JsonSerializer.DeserializeAsync<JsonDocument>(responseStream).ConfigureAwait(false);
-                    var b = result.RootElement;
-                    foreach (var item in b.EnumerateArray())
+                    var stocksResponse = await JsonSerializer.DeserializeAsync<List<FMPStockDataResponse>>(responseStream).ConfigureAwait(false);
+                    foreach (var stock in stocksResponse)
                     {
-                        item.TryGetProperty("symbol", out var ticker);
-                        item.TryGetProperty("price", out var price);
-                        stocksData.Add(new StockData { Ticker = ticker.ToString(), Price = Convert.ToDecimal(price.ToString()) });
+                        stocksList.Add(new Stock
+                        {
+                            Ticker = stock.symbol,
+                            Price = Convert.ToDecimal(stock.price),
+                            PriceLastUpdated = DateTime.Now
+                        });
                     }
                 }
                 else
@@ -51,7 +55,7 @@ namespace BuyHighSellLow.Logic.HttpClients
                     throw new Exception($"Request to get stock prices was unsuccessful: {response}");
                 }
 
-                return stocksData;
+                return stocksList;
             }
             catch (Exception ex)
             {
