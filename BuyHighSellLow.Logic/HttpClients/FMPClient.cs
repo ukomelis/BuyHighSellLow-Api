@@ -20,7 +20,7 @@ namespace BuyHighSellLow.Logic.HttpClients
             _configurationProvider = configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
         }
 
-        public async Task<List<StockData>> GetStockData(string[] tickers)
+        public async Task<List<StockData>> GetStocksData(string[] tickers)
         {
             var stocksData = new List<StockData>();
 
@@ -48,7 +48,7 @@ namespace BuyHighSellLow.Logic.HttpClients
                 }
                 else
                 {
-                    throw new Exception("Request to get stock prices was not successful");
+                    throw new Exception($"Request to get stock prices was unsuccessful: {response}");
                 }
 
                 return stocksData;

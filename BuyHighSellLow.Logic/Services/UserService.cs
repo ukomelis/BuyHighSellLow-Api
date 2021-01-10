@@ -55,7 +55,7 @@ namespace BuyHighSellLow.Logic.Services
 
         public async Task SignOut()
         {
-            await _signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync().ConfigureAwait(false);
         }
 
         public async Task RegisterUser(UserDetailsRequest requestModel)
@@ -121,8 +121,7 @@ namespace BuyHighSellLow.Logic.Services
             }
             catch (Exception ex)
             {
-
-                throw;
+                throw new Exception($"Failed to get user balance: {username}", ex);
             }
         }
 
@@ -131,14 +130,14 @@ namespace BuyHighSellLow.Logic.Services
             try
             {
                 await _stocksService.AddStocksToAccount(orders, username).ConfigureAwait(false);
-                var user = await _context.Users.FindAsync(username).ConfigureAwait(false);
+                var user = _context.Users.FirstOrDefault(x => x.UserName.Equals(username, StringComparison.OrdinalIgnoreCase));
+                if (user == null) throw new Exception($"Failed to find the user: {username}");
                 user.Balance += totalPrice;
                 await _context.SaveChangesAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-
-                throw;
+                throw new Exception("Failed to add stocks to account!", ex);
             }
         }
 
@@ -147,14 +146,14 @@ namespace BuyHighSellLow.Logic.Services
             try
             {
                 await _stocksService.RemoveStocks(orders, username).ConfigureAwait(false);
-                var user = await _context.Users.FindAsync(username).ConfigureAwait(false);
+                var user = _context.Users.FirstOrDefault(x => x.UserName.Equals(username, StringComparison.OrdinalIgnoreCase));
+                if (user == null) throw new Exception($"Failed to find the user: {username}");
                 user.Balance -= totalPrice;
                 await _context.SaveChangesAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-
-                throw;
+                throw new Exception("Failed to remove stocks from account!", ex);
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using BuyHighSellLow.DataAccess.Models.Identity;
 using BuyHighSellLow.Logic.Models.Requests;
 using BuyHighSellLow.Logic.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -27,14 +28,12 @@ namespace BuyHighSellLow.Controllers
         // GET: api/user/
         [HttpGet]
         [Route("")]
-        public async Task<IActionResult> GetUser(string username)
+        public async Task<ActionResult<BHSLUser>> GetUser(string username)
         {
             if (!ModelState.IsValid) return BadRequest();
             try
             {
-                var user = await _userService.GetUser(username);
-
-                return Ok(user);
+                return Ok(await _userService.GetUser(username).ConfigureAwait(false));
             }
             catch (Exception e)
             {
@@ -57,7 +56,7 @@ namespace BuyHighSellLow.Controllers
             if (!ModelState.IsValid) return BadRequest();
             try
             {
-                return Ok(await _userService.SignIn(requestModel));
+                return Ok(await _userService.SignIn(requestModel).ConfigureAwait(false));
             }
             catch (Exception e)
             {

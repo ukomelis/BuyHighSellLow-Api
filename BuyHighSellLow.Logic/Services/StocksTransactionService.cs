@@ -25,14 +25,14 @@ namespace BuyHighSellLow.Logic.Services
                 var totalPrice = await CalculateTotalOrderPrice(request.Orders).ConfigureAwait(false);
                 var userBalance = await _userService.GetUserBalance(request.Username).ConfigureAwait(false);
 
-                if (userBalance < totalPrice) throw new Exception("Not enough balance");
+                if (userBalance < totalPrice) throw new Exception("Not enough free balance!");
 
                 //Add stocks to acc and take payment
                 await _userService.AddStocksToAccount(request.Orders, request.Username, totalPrice).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception("Failed to buy stocks!", ex);
             }
         }
 
@@ -45,12 +45,12 @@ namespace BuyHighSellLow.Logic.Services
 
                 var totalPrice = await CalculateTotalOrderPrice(request.Orders).ConfigureAwait(false);
 
-                //Add stocks to acc and take payment
+                //Add stocks to acc and add payment to balance
                 await _userService.RemoveStocksFromAccount(request.Orders, request.Username, totalPrice).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception("Failed to sell stocks!", ex);
             }
         }
 
@@ -61,7 +61,7 @@ namespace BuyHighSellLow.Logic.Services
                 var tickers = new List<string>();
                 stockOrders.ForEach(x => tickers.Add(x.Ticker));
 
-                var stocksData = await _FMPClient.GetStockData(tickers.ToArray()).ConfigureAwait(false);
+                var stocksData = await _FMPClient.GetStocksData(tickers.ToArray()).ConfigureAwait(false);
 
                 decimal totalPrice = 0;
                 stocksData.ForEach(x => {
@@ -73,8 +73,7 @@ namespace BuyHighSellLow.Logic.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to calculate total price: {ex}");
-                throw;
+                throw new Exception("Failed to calculcate total order price", ex);
             }
         }
     }
